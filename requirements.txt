@@ -1,0 +1,17 @@
+bitsandbytes
+transformers
+accelerate
+safetensors
+huggingface_hub
+diffusers
+datasets
+omegaconf
+pyyaml
+tqdm
+Pillow
+scipy
+git+https://github.com/ostris/ai-toolkit.git@main
+
+# NOTE: Install `torch`/`torchvision` using the CUDA-specific wheel recommended for your GPU.
+# Example (Lightning Studio / CUDA 12.1):
+# pip install -U torch torchvision --index-url https://download.pytorch.org/whl/cu121

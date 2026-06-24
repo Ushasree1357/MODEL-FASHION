@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+.ipynb_checkpoints/
+
+# Notebook outputs
+*.ipynb_checkpoints
+
+# Data, models, outputs
+character_id/train/
+character_id/identity_anchors/
+character_id/validation/
+models/
+output/
+checkpoints/
+*.ckpt
+*.safetensors
+*.pt
+*.pth
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VSCode
+/.vscode/
