@@ -1,0 +1,30 @@
+{
+  "name": "ea_f_001_hana_kim_flux_lora",
+  "base_model": "black-forest-labs/FLUX.1-dev",
+  "training_type": "lora",
+  "dataset": {
+    "train_folder": "/workspace/character_id/train",
+    "captions_folder": "/workspace/character_id/train",
+    "resolution": [1024, 1024],
+    "shuffle": true,
+    "batch_size": 1,
+    "cache_latents": true
+  },
+  "training": {
+    "steps": 2500,
+    "learning_rate": 1e-4,
+    "optimizer": "AdamW8bit",
+    "lr_scheduler": "constant_with_warmup",
+    "lr_warmup_steps": 100,
+    "lora_rank": 16,
+    "lora_alpha": 16,
+    "gradient_accumulation_steps": 1,
+    "mixed_precision": "bf16",
+    "save_every_steps": 500,
+    "sample_every_steps": 250,
+    "sample_prompts": [
+      "ea_f_001_hana_kim, Hana Kim, 28-year-old East Asian Korean woman, wearing elegant red halterneck dress, outdoor garden background, high fashion editorial, 85mm portrait",
+      "ea_f_001_hana_kim, Hana Kim, 28-year-old East Asian Korean woman, wearing cream sleeveless knit dress, luxury studio background, direct gaze, soft lighting"
+    ]
+  }
+}

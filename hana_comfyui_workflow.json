@@ -1,0 +1,348 @@
+{
+  "1": {
+    "inputs": {
+      "unet_name": "flux1-dev.safetensors",
+      "weight_dtype": "default"
+    },
+    "class_type": "UNETLoader",
+    "_meta": { "title": "🔷 FLUX.1-dev Base Model" }
+  },
+  "2": {
+    "inputs": {
+      "clip_name1": "clip_l.safetensors",
+      "clip_name2": "t5xxl_fp16.safetensors",
+      "type": "flux"
+    },
+    "class_type": "DualCLIPLoader",
+    "_meta": { "title": "🔷 Dual CLIP (T5 + CLIP-L)" }
+  },
+  "3": {
+    "inputs": {
+      "vae_name": "ae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": { "title": "🔷 VAE Loader (Flux AE)" }
+  },
+  "4": {
+    "inputs": {
+      "lora_name": "ea_f_001_hana_kim_lora.safetensors",
+      "strength_model": 0.88,
+      "strength_clip": 0.88,
+      "model": ["1", 0],
+      "clip": ["2", 0]
+    },
+    "class_type": "LoraLoader",
+    "_meta": { "title": "✨ HANA Identity LoRA (EA-F-001)" }
+  },
+  "5": {
+    "inputs": {
+      "control_net_name": "flux-controlnet-openpose.safetensors"
+    },
+    "class_type": "ControlNetLoader",
+    "_meta": { "title": "🎭 Pose ControlNet (Flux OpenPose)" }
+  },
+  "6": {
+    "inputs": {
+      "ipadapter_file": "ip-adapter-flux_dev.safetensors",
+      "provider": "CUDA"
+    },
+    "class_type": "IPAdapterModelLoader",
+    "_meta": { "title": "👗 Outfit IP-Adapter Model" }
+  },
+  "7": {
+    "inputs": {
+      "clip_name": "clip_vision_vit_h.safetensors"
+    },
+    "class_type": "CLIPVisionLoader",
+    "_meta": { "title": "👁 CLIP Vision (Outfit Encoder)" }
+  },
+  "8": {
+    "inputs": {
+      "image": "pose_01_standing_front.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": { "title": "📷 Pose 1 - Standing Front (change per pose)" }
+  },
+  "9": {
+    "inputs": {
+      "image": "outfit_01_reference.jpg",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": { "title": "👗 Outfit Reference (change per outfit)" }
+  },
+  "10": {
+    "inputs": {
+      "detect_hand": "enable",
+      "detect_body": "enable",
+      "detect_face": "enable",
+      "image": ["8", 0]
+    },
+    "class_type": "DWPreprocessor",
+    "_meta": { "title": "🦾 DWPose Preprocessor (OpenPose Extract)" }
+  },
+  "11": {
+    "inputs": {
+      "text": "ea_f_001_hana_kim, Hana Kim, 28-year-old South Korean Vogue editorial fashion model, balanced oval face, elegant high cheekbones, feminine soft jawline, rounded chin, deep brown almond eyes, warm amber iris flecks, beauty mark below left jawline, dark chestnut mid-back hair, light beige skin, visible pores, natural skin grain, peach fuzz, poised confidence, calm direct gaze, [OUTFIT_DESCRIPTION], [LOCATION_DESCRIPTION], luxury editorial fashion photography, cinematic lighting, 85mm portrait, shot on Hasselblad, ultra-detailed skin texture, photorealistic",
+      "clip": ["4", 1]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": { "title": "✍️ Positive Prompt (Edit OUTFIT + LOCATION tags)" }
+  },
+  "12": {
+    "inputs": {
+      "text": "blurry, low quality, distorted face, extra limbs, bad anatomy, bad eyes, disfigured, deformed, plastic skin, over-retouched, CGI, 3D render, illustration, animation, cartoon, watermark, logo, text overlay, heavy sunglasses, big hats, hands covering face, strong filters, out of frame, cropped face, double face, mutated, cloned face, asymmetric eyes (extreme), airbrushed skin, fake skin, mannequin, wax figure",
+      "clip": ["4", 1]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": { "title": "🚫 Negative Prompt (Identity Protection)" }
+  },
+  "13": {
+    "inputs": {
+      "strength": 0.78,
+      "start_percent": 0.0,
+      "end_percent": 0.85,
+      "positive": ["11", 0],
+      "negative": ["12", 0],
+      "control_net": ["5", 0],
+      "image": ["10", 0]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": { "title": "🎭 Apply Pose ControlNet" }
+  },
+  "14": {
+    "inputs": {
+      "weight": 0.72,
+      "weight_type": "linear",
+      "combine_embeds": "concat",
+      "start_at": 0.0,
+      "end_at": 0.9,
+      "embeds_scaling": "V only",
+      "model": ["4", 0],
+      "ipadapter": ["6", 0],
+      "image": ["9", 0],
+      "clip_vision": ["7", 0],
+      "attn_mask": ["15", 0]
+    },
+    "class_type": "IPAdapterAdvanced",
+    "_meta": { "title": "👗 Apply Outfit IP-Adapter (Advanced)" }
+  },
+  "15": {
+    "inputs": {
+      "mask_type": "upper_body",
+      "grow_mask_by": 6,
+      "width": 1024,
+      "height": 1536
+    },
+    "class_type": "IPAdapterMaskFromVector",
+    "_meta": { "title": "🎭 IP-Adapter Mask (Body Region)" }
+  },
+  "16": {
+    "inputs": {
+      "width": 1024,
+      "height": 1536,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": { "title": "🖼 Canvas: 1024×1536 (2:3 Editorial)" }
+  },
+  "17": {
+    "inputs": {
+      "seed": 420691337,
+      "steps": 28,
+      "cfg": 3.5,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1.0,
+      "model": ["14", 0],
+      "positive": ["13", 0],
+      "negative": ["13", 1],
+      "latent_image": ["16", 0]
+    },
+    "class_type": "KSampler",
+    "_meta": { "title": "⚡ KSampler (Flux FlowMatch)" }
+  },
+  "18": {
+    "inputs": {
+      "samples": ["17", 0],
+      "vae": ["3", 0]
+    },
+    "class_type": "VAEDecode",
+    "_meta": { "title": "🖼 VAE Decode" }
+  },
+  "19": {
+    "inputs": {
+      "upscale_model": "4x-UltraSharp.pth"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": { "title": "🔍 4x UltraSharp Upscaler" }
+  },
+  "20": {
+    "inputs": {
+      "upscale_model": ["19", 0],
+      "image": ["18", 0]
+    },
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": { "title": "🔍 Upscale to 4K" }
+  },
+  "21": {
+    "inputs": {
+      "width": 2048,
+      "height": 3072,
+      "upscale_method": "lanczos",
+      "crop": "disabled",
+      "image": ["20", 0]
+    },
+    "class_type": "ImageScale",
+    "_meta": { "title": "📐 Final Scale 2048×3072" }
+  },
+  "22": {
+    "inputs": {
+      "model": ["4", 0],
+      "clip": ["4", 1],
+      "vae": ["3", 0],
+      "samples": ["17", 0],
+      "image": ["18", 0],
+      "positive": ["13", 0],
+      "negative": ["13", 1],
+      "seed": 420691337,
+      "steps": 14,
+      "cfg": 2.0,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 0.28
+    },
+    "class_type": "KSamplerAdvanced",
+    "_meta": { "title": "✨ Detail Refiner (Face + Skin Pass)" }
+  },
+  "23": {
+    "inputs": {
+      "samples": ["22", 0],
+      "vae": ["3", 0]
+    },
+    "class_type": "VAEDecode",
+    "_meta": { "title": "🖼 VAE Decode (Refined)" }
+  },
+  "24": {
+    "inputs": {
+      "filename_prefix": "HANA/pose01_outfit01_indoor",
+      "images": ["21", 0]
+    },
+    "class_type": "SaveImage",
+    "_meta": { "title": "💾 Save: pose01_outfit01_indoor (rename per combo)" }
+  },
+  "25": {
+    "inputs": {
+      "filename_prefix": "HANA/refined/pose01_outfit01_indoor_refined",
+      "images": ["23", 0]
+    },
+    "class_type": "SaveImage",
+    "_meta": { "title": "💾 Save Refined Output" }
+  },
+  "26": {
+    "inputs": {
+      "image": "hana_face_reference_anchor.jpg",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": { "title": "🧬 HANA Face Anchor (Identity Lock Reference)" }
+  },
+  "27": {
+    "inputs": {
+      "weight": 0.35,
+      "weight_type": "style transfer",
+      "combine_embeds": "add",
+      "start_at": 0.0,
+      "end_at": 0.6,
+      "embeds_scaling": "K+V",
+      "model": ["14", 0],
+      "ipadapter": ["6", 0],
+      "image": ["26", 0],
+      "clip_vision": ["7", 0]
+    },
+    "class_type": "IPAdapterAdvanced",
+    "_meta": { "title": "🧬 Face Identity Lock (Secondary IP-Adapter)" }
+  },
+  "28": {
+    "inputs": {
+      "seed": 420691337,
+      "steps": 28,
+      "cfg": 3.5,
+      "sampler_name": "euler",
+      "scheduler": "simple",
+      "denoise": 1.0,
+      "model": ["27", 0],
+      "positive": ["13", 0],
+      "negative": ["13", 1],
+      "latent_image": ["16", 0]
+    },
+    "class_type": "KSampler",
+    "_meta": { "title": "⚡ KSampler WITH Face Lock (Use this for consistency)" }
+  },
+  "29": {
+    "inputs": {
+      "samples": ["28", 0],
+      "vae": ["3", 0]
+    },
+    "class_type": "VAEDecode",
+    "_meta": { "title": "🖼 VAE Decode (Face-Locked)" }
+  },
+  "30": {
+    "inputs": {
+      "upscale_model": ["19", 0],
+      "image": ["29", 0]
+    },
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": { "title": "🔍 Upscale Face-Locked Output" }
+  },
+  "31": {
+    "inputs": {
+      "width": 2048,
+      "height": 3072,
+      "upscale_method": "lanczos",
+      "crop": "disabled",
+      "image": ["30", 0]
+    },
+    "class_type": "ImageScale",
+    "_meta": { "title": "📐 Final Scale - Face Locked Version" }
+  },
+  "32": {
+    "inputs": {
+      "filename_prefix": "HANA/face_locked/pose01_outfit01_indoor_facelocked",
+      "images": ["31", 0]
+    },
+    "class_type": "SaveImage",
+    "_meta": { "title": "💾 Save Face-Locked Version (RECOMMENDED OUTPUT)" }
+  },
+  "POSE_VARIANTS_NOTES": {
+    "_meta": {
+      "title": "📋 GENERATION MATRIX — Read This",
+      "notes": {
+        "poses": {
+          "P1": "Standing front, arms relaxed - pose_01_standing_front.png",
+          "P2": "3/4 turn left, one hand on hip - pose_02_three_quarter_left.png",
+          "P3": "Walking stride, natural motion - pose_03_walking.png",
+          "P4": "Sitting elegantly, legs crossed - pose_04_sitting.png",
+          "P5": "Profile right, looking over shoulder - pose_05_profile_glance.png"
+        },
+        "outfits": {
+          "O1": "Pleated emerald green silk halterneck maxi dress - editorial, floor-length",
+          "O2": "Tailored camel coat + ivory silk blouse + wide-leg trousers",
+          "O3": "Sleeveless cream ribbed knit midi dress, minimal jewelry",
+          "O4": "Black asymmetric shoulder evening gown, luxury editorial",
+          "O5": "White poplin halterneck maxi dress, fresh daytime energy"
+        },
+        "locations": {
+          "L1": "INDOOR - Luxury marble studio, soft Rembrandt lighting from left window",
+          "L2": "OUTDOOR - Parisian garden, natural overcast daylight, golden hour edge light",
+          "L3": "INDOOR - Minimalist art gallery, white walls, directional track lighting"
+        },
+        "generation_order": "Load pose_XX.png in node 8, outfit_XX.jpg in node 9, edit [OUTFIT_DESCRIPTION] and [LOCATION_DESCRIPTION] in node 11, change filename prefix in node 32, then queue. Repeat for all 75 combos (5×5×3).",
+        "lora_strength_guide": "0.85-0.90 for identity consistency; lower to 0.75 if outfit bleed occurs",
+        "ipadapter_outfit_weight": "0.65-0.75 for clean outfit transfer; raise to 0.80 for stronger pattern fidelity",
+        "ipadapter_face_weight": "0.30-0.40 for subtle identity lock on top of LoRA"
+      }
+    }
+  }
+}

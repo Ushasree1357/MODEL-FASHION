@@ -1,0 +1,25 @@
+character_identity:
+  id: "EA-F-001"
+  name: "Hana Kim"
+  trigger_token: "ea_f_001_hana_kim"
+  age: 28
+  ethnicity: "South Korean"
+  physical_dna:
+    face: "balanced oval face, elegant high cheekbones, soft jawline, rounded chin"
+    eyes: "deep brown almond eyes, warm amber iris flecks, subtle limbal ring"
+    nose: "refined straight nose with narrow bridge, softly refined tip"
+    lips: "medium-full, natural rose lip tone, visible texture"
+    skin: "light beige skin, neutral warm undertone, visible pores, natural grain"
+    hair: "dark chestnut mid-back hair, luxury blowout, temple baby hairs"
+    identity_markers: "beauty mark below left jawline"
+  anchors:
+    - "01_front_neutral"
+    - "02_3-4_left"
+    - "03_3-4_right"
+    - "04_profile_left"
+    - "05_profile_right"
+    - "06_beauty_mark_visible"
+    - "07_natural_smile"
+    - "08_serious_expression"
+    - "09_hair_back"
+    - "10_no_makeup"
